@@ -2,7 +2,7 @@
 
 This browser extension for Chrome and Firefox automates Moodle test-taking using AI technology. It interacts with Moodle's user interface to automatically select and submit answers, and to navigate through tests.
 
-![moodle preview with extension expanding buttons](image-1.png)
+![moodle preview with extension expanding buttons](./img/content.png)
 
 ### Extension Features:
 
@@ -14,7 +14,7 @@ This browser extension for Chrome and Firefox automates Moodle test-taking using
 
 ### Popup:
 
-![Popup preview](image.png)
+![Popup preview](./img/popup.png)
 
 The popup script provides an interface for managing the API key used for AI interactions:
 
