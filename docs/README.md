@@ -20,7 +20,7 @@ The popup script provides an interface for managing the API key used for AI inte
 
 ### How to Build the Extension:
 
-To build and install the extension in your browser, follow the instructions in [Extension_Builder.md](./Extension/Extension_Builder.md) located in the `Extension` folder.
+To build and install the extension in your browser, follow the instructions in [Extension_Builder.md](../Extension/Extension_Builder.md) located in the `Extension` folder.
 
 
 
