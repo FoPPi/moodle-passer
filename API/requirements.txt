@@ -1,0 +1,4 @@
+pip install fastapi==0.85.0 
+uvicorn[standard]==0.18.2
+python-dotenv==0.21.0
+pydantic==1.10.2

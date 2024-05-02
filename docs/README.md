@@ -18,9 +18,13 @@ This browser extension for Chrome and Firefox automates Moodle test-taking using
 
 The popup script provides an interface for managing the API key used for AI interactions:
 
-### How to Build the Extension:
+## How to Build the Browser Extension
 
-To build and install the extension in your browser, follow the instructions in [Extension_Builder.md](../Extension/Extension_Builder.md) located in the `Extension` folder.
+To build and install the extension in your browser, follow the detailed instructions provided in the [Extension Builder Guide](../Extension/Extension_Builder.md) located in the `Extension` folder of the project repository.
+
+## How to Start the FastAPI Server
+
+For instructions on how to start the FastAPI server, including setting up your environment and running the server, refer to the [API Runner Guide](../API/Api_Runner.md) found in the `API` folder.
 
 
 
