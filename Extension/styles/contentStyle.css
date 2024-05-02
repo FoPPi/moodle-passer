@@ -1,0 +1,84 @@
+* {
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+
+
+.extention-custom-button {
+  color: #ffffff;
+  background-color: #3b11d1;
+  border-color: #3b11d1;
+  padding: 5px 10px;
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.extention-custom-button:hover {
+  background-color: #14054b;
+  border-color: #14054b;
+}
+
+.extention-custom-button:active {
+  background-color: #6848dd;
+  border-color: #6848dd;
+}
+
+.extention-custom-button.custom-button-red{
+  color: #ffffff;
+  background-color: #d11111;
+  border-color: #d11111;
+} 
+
+.extention-custom-button.custom-button-red:hover {
+  background-color: #4b0505;
+  border-color: #4b0505;
+}
+
+.extention-custom-button.custom-button-red:active {
+  background-color: #dd5248;
+  border-color: #dd5248;
+}
+
+.custom-toast {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: auto;
+  min-width: 250px;
+  background-color: #3b11d1;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 2000;
+}
+
+.toast-close-btn {
+  border: 2px solid #2f1296;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #2f1296;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toast-close-btn:hover {
+  background-color: #1c0d52;
+  border-color:#3b20a0;
+}
