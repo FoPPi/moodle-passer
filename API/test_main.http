@@ -1,20 +1,5 @@
 # Test your FastAPI endpoints
 
-POST http://127.0.0.1:8000/
-Content-Type: application/json
 
-{
-    "test_type": "JS",
-    "question": "Дано наступний код: CSS\tHTML body {     color: white;     background-color: blue; } .important {     color: yellow;     font-style: italic; } .highlight {     color: gray; } #vital {     color: yellow;     font-weight: bold; } ul li, ol {     color: white;     background-color: red; } body > li {     background-color: purple;  } \t <body>     <p>Paragraph 1</p>     <ul>         <liclass=\"important\"id=\"vital\">Item 1</li>         <li>Item 2</li>     </ul>     <pclass=\"important highlight\">Paragraph 2</p>     <ol>         <liclass=\"highlight\">Item 3</li>     </ol> </body> Визначте правильні значення властивостей стилю дляItem3",
-  "prompt": 2,
-  "answers": [
-    "a. font-style: italic",
-    "b. background-color: red",
-    "c. color: yellow",
-    "d. color: white",
-    "e. background-color: purple",
-    "f. background-color: blue",
-    "g. font-weight: bold",
-    "h. color: gray"
-  ]
-  }
+
+GET http://127.0.0.1:8000/user/generate
