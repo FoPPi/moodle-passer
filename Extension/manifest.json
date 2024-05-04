@@ -17,7 +17,8 @@
     {
       "css": ["./styles/contentStyle.css"],
       "js": ["./scripts/browser_polyfil.js", "./scripts/main.js"],
-      "matches": ["*://*.edu.ua/mod/quiz/*", "http://127.0.0.1:5500/*"]
+      "matches": ["*://*.edu.ua/mod/quiz/*", "http://127.0.0.1:5500/*"],
+      "run_at": "document_start"
     }
   ]
 }

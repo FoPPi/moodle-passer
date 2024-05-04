@@ -1,18 +1,157 @@
-### Running Server:
+### Documentation for FastAPI Application Setup and API Testing
 
-1. **Install Packages Globally:**
-   ```bash
-   pip install fastapi==0.110.3 uvicorn==0.29.0 pydantic==2.7.1 python-dotenv==1.0.1 g4f==0.3.0.7
-   ```
-   OR
+This document provides comprehensive instructions for setting up and testing a FastAPI application using Uvicorn as the server. Additionally, it outlines the procedure for using Visual Studio Code with the REST Client extension to test API endpoints effectively.
+
+#### Prerequisites
+
+Ensure Python is installed on your system, along with `pip` for managing Python packages.
+
+#### Installation Steps
+
+1. **Install Required Packages**:
+   
+   To avoid potential conflicts with other projects, it is recommended to use a virtual environment for package installations. Execute the following command to install the necessary packages:
+
    ```bash
    pip install -r requirements.txt
    ```
 
-   This command will install these packages for all projects and users (depending on whether you have administrative rights or not).
+   This command installs all dependencies listed in your `requirements.txt`, which should include FastAPI, Uvicorn, and any others your application requires.
 
-2. **Run Your Application:**
+2. **Running the Application**:
+   
+   Start your FastAPI application using the following command. The `--reload` flag is particularly useful during development as it allows the server to automatically reload upon code changes.
+
    ```bash
    uvicorn main:app --reload
    ```
-   You can run your FastAPI application directly using Uvicorn.
+
+   `main` is the Python file where your FastAPI app is defined (`main.py`), and `app` is the FastAPI instance.
+
+3. **Setup API Key**:
+
+   - Create a `.env` file in the root directory of your project. This file will store the API key needed for authentication.
+
+   ```
+   API_KEY=your_actual_api_key_here
+   ```
+
+   Use this API key to authenticate requests to your API endpoints.
+
+#### API Testing with Visual Studio Code
+
+Utilize the REST Client extension in Visual Studio Code to facilitate API testing. Configure your requests in a `test_main.http` file as follows:
+
+1. **Global Variables**:
+   
+   Define essential variables at the start of the file for easy management of frequently used data like host URL, API key, and user key.
+
+   ```http
+   @host = http://127.0.0.1:8000
+   @api_key = your_actual_api_key_here
+   @user_key = Enter_Key_Here_After_Generation
+   ```
+
+#### API Endpoints
+
+   - **Generate User**:
+     This endpoint generates a new `user_key`.
+   
+     ```http
+     ### Generate User
+     GET {{host}}/user/generate
+     api_key: {{api_key}}
+     ```
+
+   - **Activate User**:
+     This endpoint activates the `user_key` obtained from the "Generate User" step.
+   
+     ```http
+     ### Activate User
+     POST {{host}}/user/activate
+     Content-Type: application/json
+     api_key: {{api_key}}
+     user_key: {{user_key}}
+     ```
+
+   - **GPT Request**:
+     Processes a question through GPT using the specified parameters.
+   
+     ```http
+     ### GPT Request
+     POST {{host}}/
+     Content-Type: application/json
+     api_key: {{api_key}}
+     user_key: {{user_key}}
+
+     {
+       "test_type": "Math",
+       "question": "What is 2 + 2?",
+       "prompt": 1,
+       "answers": ["1", "2", "3", "4"]
+     }
+     ```
+
+### Detailed Guide: Getting and Using a User Key
+
+#### 1. Generate User Key:
+   - **Endpoint**: `/user/generate`
+   - **Method**: GET
+   - **Description**: This endpoint is used to generate a new `user_key` for a user. It requires an `api_key` for authentication to ensure only authorized requests can generate keys.
+   - **API Call**:
+     ```http
+     ### Generate User Key
+     GET {{host}}/user/generate
+     api_key: {{api_key}}
+     ```
+   - **Successful Response Example**:
+     ```json
+     {
+       "key": "5aa95829-bb1c-4722-a3f3-a68f64bedf78"
+     }
+     ```
+     Upon successful request, the server returns a JSON object containing the `user_key`. You should copy this key for subsequent operations such as user activation.
+
+#### 2. Activate User Key:
+   - **Endpoint**: `/user/activate`
+   - **Method**: POST
+   - **Description**: Once a `user_key` is generated, it must be activated before it can be used for authorized actions within the API. This endpoint activates the `user_key`.
+   - **API Call**:
+     ```http
+     ### Activate User Key
+     POST {{host}}/user/activate
+     Content-Type: application/json
+     api_key: {{api_key}}
+     user_key: {{user_key}}
+     ```
+   - **Request Body**: Ensure to replace `{{user_key}}` with the key obtained from the "Generate User Key" response.
+
+#### How to Use the Generated and Activated User Key
+
+- **Execute the Generate User Key Request**: Use the REST Client by clicking `Send Request` above the `GET {{host}}/user/generate` request in your `test_main.http` file.
+- **Copy the `user_key` from the Response**: The key generated by the server will be displayed in the response body as shown in the example. Replace `Enter_Key_Here_After_Generation` with this `user_key` in the `test_main.http` file.
+- **Activate the User Key**: With the `user_key` set in the file, execute the Activate User Key request. This will make the key active and ready for use in subsequent API requests that require user authentication.
+
+#### Testing with an Activated User Key
+Once the user key is activated, it can be used to authenticate further requests to the API that require a user key. Here’s an example of how to use it:
+
+```http
+### GPT Request
+POST {{host}}/
+Content-Type: application/json
+api_key: {{api_key}}
+user_key: {{user_key}}
+
+{
+  "test_type": "Math",
+  "question": "What is 2 + 2?",
+  "prompt": 1,
+  "answers": ["1", "2", "3", "4"]
+}
+```
+
+#### How to Use
+
+- Open your `test_main.http` file in Visual Studio Code.
+- Position your cursor over the name of a request and click the `Send Request` link that appears above it to execute.
+- Ensure your FastAPI server is active as per the earlier instructions.

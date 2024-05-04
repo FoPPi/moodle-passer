@@ -1,5 +1,28 @@
-# Test your FastAPI endpoints
+# use for API testing via Visual Studio Code with the REST Client extension
 
+@host = http://127.0.0.1:8000
+@api_key = your_actual_api_key_here
+@user_key = Enter_Key_Here_After_Generation
 
+### Generate User
+GET {{host}}/user/generate
+api_key: {{api_key}}
 
-GET http://127.0.0.1:8000/user/generate
+### Activate User
+POST {{host}}/user/activate
+Content-Type: application/json
+api_key: {{api_key}}
+user_key: {{user_key}}
+
+### GPT Request
+POST {{host}}/
+Content-Type: application/json
+api_key: {{api_key}}
+user_key: {{user_key}}
+
+{
+  "test_type": "Math",
+  "question": "What is 2 + 2?",
+  "prompt": 1,
+  "answers": ["1", "2", "3", "4"]
+}

@@ -2,13 +2,12 @@ const fs = require('fs');
 const archiver = require('archiver');
 const path = require('path');
 
-const firefoxGeckoId = "passer@example.com"; 
-serverLink = "*://127.0.0.1/*";
+const firefoxGeckoId = "passer@example.com";
+const serverLink = "*://127.0.0.1/*";  // Ensure this is declared
 
 function readBaseManifest() {
   const manifestPath = path.join(__dirname, 'manifest.json');
-  const manifestData = fs.readFileSync(manifestPath, 'utf8');
-  return JSON.parse(manifestData);
+  return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 }
 
 function modifyManifestForBrowser(manifest, browserName) {
@@ -27,110 +26,86 @@ function modifyManifestForBrowser(manifest, browserName) {
         "128": "./icons/128.png"
       }
     };
-    modifiedManifest.permissions = ["storage",
-    serverLink];
-
+    modifiedManifest.permissions = ["storage", serverLink];
     modifiedManifest.background = {
       "scripts": ["./scripts/background.js"],
       "persistent": false
     };
-
     modifiedManifest.browser_specific_settings = {
       "gecko": {
         "id": firefoxGeckoId
       }
-    }
-
+    };
     delete modifiedManifest.action;
   }
 
   return modifiedManifest;
 }
 
-
-
-function createManifest(browserName) {
-  const baseManifest = readBaseManifest();
-  const manifest = modifyManifestForBrowser(baseManifest, browserName);
-
-  const baseDir = path.join(__dirname, 'build', browserName);
-  if (!fs.existsSync(baseDir)) {
-    fs.mkdirSync(baseDir, { recursive: true });
-  }
-
-  const manifestPath = path.join(baseDir, 'manifest.json');
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-  return { manifestPath, baseDir };
-}
-
-
 function copyDirectory(source, target, excludeFiles = []) {
   if (!fs.existsSync(target)) {
-      fs.mkdirSync(target, { recursive: true });
+    fs.mkdirSync(target, { recursive: true });
   }
   const items = fs.readdirSync(source);
-  for (const item of items) {
-      if (excludeFiles.includes(item)) {
-          continue; 
-      }
+  items.forEach(item => {
+    if (!excludeFiles.includes(item)) {
       const sourcePath = path.join(source, item);
       const targetPath = path.join(target, item);
       if (fs.lstatSync(sourcePath).isDirectory()) {
-          copyDirectory(sourcePath, targetPath, excludeFiles);
+        copyDirectory(sourcePath, targetPath, excludeFiles);
       } else {
-          fs.copyFileSync(sourcePath, targetPath);
+        fs.copyFileSync(sourcePath, targetPath);
       }
+    }
+  });
+}
+
+function deleteDirectory(directoryPath) {
+  if (fs.existsSync(directoryPath)) {
+    fs.readdirSync(directoryPath).forEach(file => {
+      const curPath = path.join(directoryPath, file);
+      if (fs.lstatSync(curPath).isDirectory()) {
+        deleteDirectory(curPath);
+      } else {
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(directoryPath);
   }
 }
 
-function createArchive(browserName) {
-  const { manifestPath, baseDir } = createManifest(browserName);
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-
-  const sourceDirs = {
-    pages: './pages',
-    styles: './styles',
-    scripts: './scripts',
-    icons: './icons'
-  };
-
-  const excludeFiles = [];
-  if (manifest.manifest_version === 3) {
-    excludeFiles.push('background.js'); // Exclude background.js for Chrome if manifest version 3
-  }
-
-  const distPath = path.join(__dirname, 'dist');
-  if (!fs.existsSync(distPath)) {
-    fs.mkdirSync(distPath);
-  }
-
-  const outputPath = path.join(distPath, `${browserName}_v${manifest.version}.zip`);
+function createArchive(buildDir, browserName, version) {
+  const outputPath = path.join(__dirname, 'dist', `${browserName}_v${version}.zip`);
   const output = fs.createWriteStream(outputPath);
   const archive = archiver('zip', { zlib: { level: 9 } });
 
-  output.on('close', function () {
-    console.log(`${browserName} - Archive created successfully. Total bytes: ${archive.pointer()} | Kilobytes: ${(archive.pointer() / 1024).toFixed(0)}`);
-  });
-
-  archive.on('error', function (err) {
-    throw err;
-  });
-
+  archive.on('error', err => { throw err; });
   archive.pipe(output);
-
-  // Copying directories to baseDir subject to exceptions
-  for (const [dir, source] of Object.entries(sourceDirs)) {
-    copyDirectory(path.join(__dirname, source), path.join(baseDir, dir), excludeFiles);
-  }
-
-  archive.file(manifestPath, { name: 'manifest.json' });
-  archive.directory(baseDir, false); // Archive the contents of baseDir
+  archive.directory(buildDir, false);
   archive.finalize();
+
+  output.on('close', () => {
+    console.log(`Archive for ${browserName} created successfully. Total bytes: ${archive.pointer()}`);
+  });
 }
 
-// Creating archives for Chrome and Firefox
-createArchive('chrome');
-createArchive('firefox');
+function buildForBrowser(browserName) {
+  const buildDir = path.join(__dirname, 'build', browserName);
+  deleteDirectory(buildDir);
+  fs.mkdirSync(buildDir, { recursive: true });
+  console.log(`Build directory for ${browserName} created.`);
 
+  const manifest = modifyManifestForBrowser(readBaseManifest(), browserName);
+  fs.writeFileSync(path.join(buildDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
 
+  const excludeFiles = manifest.manifest_version === 3 ? ['background.js'] : []; // Exclude for Chrome if manifest version 3
 
+  ['pages', 'styles', 'scripts', 'icons'].forEach(dir => {
+    copyDirectory(path.join(__dirname, dir), path.join(buildDir, dir), excludeFiles);
+  });
+
+  createArchive(buildDir, browserName, manifest.version);
+}
+
+buildForBrowser('chrome');
+buildForBrowser('firefox');

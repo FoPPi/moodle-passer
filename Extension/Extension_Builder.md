@@ -12,6 +12,12 @@ Once Node.js is installed, navigate to the root of your project directory in a t
 npm install
 ```
 
+OR
+
+```shell
+npm ci
+```
+
 ## File Structure
 
 - `build-extension.js`: Main script file for building the extension.
@@ -51,13 +57,14 @@ This command triggers the build script which will perform the following actions:
    - Compresses the build directory into a `.zip` file suitable for distribution.
    - The archive is saved under `dist/` with the naming format `{browserName}_v{version}.zip`.
 
-### Functions
+### Core Functions
 
-- `readBaseManifest()`: Reads and returns the base manifest file.
-- `modifyManifestForBrowser(manifest, browserName)`: Returns a modified manifest specific to the browser.
-- `createManifest(browserName)`: Handles the creation of browser-specific manifest files.
-- `copyDirectory(source, target, excludeFiles)`: Copies directories while excluding specified files.
-- `createArchive(browserName)`: Creates a zip archive for the specified browser.
+- `readBaseManifest()`: Parses the base manifest from a JSON file.
+- `modifyManifestForBrowser(manifest, browserName)`: Adapts the manifest according to the needs of different browsers.
+- `deleteDirectory(directoryPath)`: Clears specified directories recursively to ensure clean builds.
+- `copyDirectory(source, target, excludeFiles)`: Copies directories and files, applying exclusions.
+- `createArchive(buildDir, browserName, version)`: Compresses and packages the build directory into a zip file.
+- `buildForBrowser(browserName)`: Manages the complete build process for each browser.
 
 ## Error Handling
 
