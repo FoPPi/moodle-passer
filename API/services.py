@@ -7,15 +7,14 @@ from dotenv import dotenv_values
 config = dotenv_values(".env")
 
 
-async def generate_user_key(db):
+async def generate_user_key(db, donate):
+    if int(donate.amount) < 10:
+        raise HTTPException(status_code=403, detail="Donation amount must be greater than 100")
+
     key = uuid.uuid4().__str__()
-
     try:
-        await db.insert_data('users', {
-            'subscription_key': key,
-        })
-
-        return {'key': key}
+        await db.insert_data('users', {'pub_id': donate.pubId, 'subscription_key': key})
+        return key
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -55,8 +54,15 @@ async def check_user_key(db, key):
         return True
 
 
-async def check_api_key(api_key):
-    if api_key != config.get("API_KEY"):
+async def check_api_key(key):
+    if key != config.get("API_KEY"):
+        raise HTTPException(status_code=403, detail="Invalid API key")
+    else:
+        return True
+
+
+async def check_donatello_key(key):
+    if key != config.get("DONATELLO_API_KEY"):
         raise HTTPException(status_code=403, detail="Invalid API key")
     else:
         return True
