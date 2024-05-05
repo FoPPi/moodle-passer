@@ -68,7 +68,7 @@ async def gpt_request(question_data: Question, api_key: str = Depends(api_key_qu
             max_tokens=1000,
             messages=[{"role": "user",
                        "content": f"Help me to solve a question of {test_type}. "
-                                  f"{'Write only letter of the answer!'} "
+                                  f"{'Write only letter of the answer!' if type != -1 else ''} "
                                   f"Question: {question}. "
                                   f"Answers: {answers if type != -1 else 'empty'}. "
                                   f"{typeText}"
