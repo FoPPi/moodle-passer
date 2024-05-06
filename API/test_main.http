@@ -2,19 +2,31 @@
 
 @host = http://127.0.0.1:8000
 @api_key = your_actual_api_key_here
+@donatello_key = your_actual_donatello_api_key_here
 @user_key = Enter_Key_Here_After_Generation
+
+### Generate User Key and send it to mail
+POST {{host}}/user/donates
+Content-Type: application/json
+X-Key: {{donatello_key}}
+
+{
+  "pubId": "D41-123123",
+  "message": "your_mail",
+  "amount": "100"
+}
 
 ### Activate User
 POST {{host}}/user/activate
 Content-Type: application/json
-api_key: {{api_key}}
-user_key: {{user_key}}
+X-Api-Key: {{api_key}}
+X-User-Key: {{user_key}}
 
 ### GPT Request
 POST {{host}}/
 Content-Type: application/json
-api_key: {{api_key}}
-user_key: {{user_key}}
+X-Api-Key: {{api_key}}
+X-User-Key: {{user_key}}
 
 {
   "test_type": "Math",
@@ -22,3 +34,5 @@ user_key: {{user_key}}
   "prompt": 1,
   "answers": ["1", "2", "3", "4"]
 }
+
+

@@ -12,14 +12,15 @@ PORT = int(config.get("SMTP_PORT"))
 FROM_EMAIL = config.get("SMTP_USERNAME")
 PASSWORD = config.get("SMTP_PASSWORD")
 
-message = MIMEMultipart("alternative")
-message['Subject'] = "Subscription"
-message['From'] = FROM_EMAIL
-message['Cc'] = FROM_EMAIL
-message['Bcc'] = FROM_EMAIL
+
 
 
 async def send_mail(TO_EMAIL, key):
+    message = MIMEMultipart("alternative")
+    message['Subject'] = "Subscription"
+    message['From'] = FROM_EMAIL
+    message['Cc'] = FROM_EMAIL
+    message['Bcc'] = FROM_EMAIL
     message['To'] = TO_EMAIL
 
     html = ""
