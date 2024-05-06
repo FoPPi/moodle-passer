@@ -8,7 +8,7 @@ config = dotenv_values(".env")
 
 
 async def generate_user_key(db, donate):
-    if int(donate.amount) < 10:
+    if int(donate.amount) < 100:
         raise HTTPException(status_code=403, detail="Donation amount must be greater than 100")
 
     key = uuid.uuid4().__str__()
@@ -62,7 +62,7 @@ async def check_api_key(key):
 
 
 async def check_donatello_key(key):
-    if key != config.get("DONATELLO_API_KEY"):
+    if key != config.get("DONATELLO_KEY"):
         raise HTTPException(status_code=403, detail="Invalid API key")
     else:
         return True

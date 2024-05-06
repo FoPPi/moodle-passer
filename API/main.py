@@ -17,9 +17,9 @@ db = Database('subscription.db')
 db.connect()
 
 # API key security
-api_key_query = APIKeyHeader(name="api_key")
-user_key_query = APIKeyHeader(name="user_key")
-donatello_api_key_query = APIKeyHeader(name="X-Key")
+api_key_query = APIKeyHeader(name="X-Api-Key")
+user_key_query = APIKeyHeader(name="X-User-Key")
+donatello_key_query = APIKeyHeader(name="X-Key")
 
 # Add CORS middleware
 app.add_middleware(
@@ -27,7 +27,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["POST"],
-    allow_headers=["api_key", "user_key", "X-Key", "Authorization", "Content-Type"],
+    allow_headers=["X-Api-Key", "X-User-Key", "X-Key", "Authorization", "Content-Type"],
 )
 
 
@@ -85,8 +85,8 @@ async def activate_user(api_key: str = Depends(api_key_query), user_key: str = D
 
 
 @app.post("/user/donates")
-async def get_donates(donate_data: Donate, donatello_api_key: str = Depends(donatello_api_key_query)):
-    if await check_donatello_key(donatello_api_key):
+async def get_donates(donate_data: Donate, donatello_key: str = Depends(donatello_key_query)):
+    if await check_donatello_key(donatello_key):
         key = await generate_user_key(db, donate_data)
         await send_mail(donate_data.message, key)
         return {"status": "success"}
