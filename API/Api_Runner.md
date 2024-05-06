@@ -34,6 +34,7 @@ Ensure Python is installed on your system, along with `pip` for managing Python 
 
    ```
    API_KEY=your_actual_api_key_here
+   SMTP_PORT=INT_NUM
    ```
 
    Use this API key to authenticate requests to your API endpoints.

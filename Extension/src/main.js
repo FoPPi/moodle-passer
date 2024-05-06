@@ -1,3 +1,4 @@
+
 serverLink = "http://127.0.0.1:8000";
 
 const baseToastDeley = 3000;
@@ -434,8 +435,20 @@ async function main() {
 }
 
 
-if (isChromiumBased()) {
-  document.body.onload = main;
-} else{
-  main();
+function workInThisPage(){
+  return window.url.includes("attempt")
 }
+
+
+function searchForAnswer() {
+  const interval = setInterval(() => {
+    const answerElement = document.querySelector(".answer");
+    if (answerElement) {
+      console.log("Элемент '.answer' найден!");
+      main(answerElement);
+      clearInterval(interval);
+    } 
+  }, 500);
+}
+
+searchForAnswer()

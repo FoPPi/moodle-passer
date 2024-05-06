@@ -1,16 +1,32 @@
 {
   "name": "moodle-passer",
   "version": "1.0.0",
-  "main": "build-extension.js",
   "scripts": {
-    "start": "node build-extension.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:chrome:dev": "cross-env BROWSER=chrome NODE_ENV=development webpack --config webpack.config.js",
+    "build:firefox:dev": "cross-env BROWSER=firefox NODE_ENV=development webpack --config webpack.config.js",
+    "build:chrome:prod": "cross-env BROWSER=chrome NODE_ENV=production webpack --config webpack.config.js",
+    "build:firefox:prod": "cross-env BROWSER=firefox NODE_ENV=production webpack --config webpack.config.js",
+    "build:dev": "npm run build:chrome:dev && npm run build:firefox:dev",
+    "build:prod": "npm run build:chrome:prod && npm run build:firefox:prod"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "archiver": "^7.0.1"
+    "archiver": "^7.0.1",
+    "webextension-polyfill": "^0.11.0"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "babel-loader": "^9.1.3",
+    "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^7.1.1",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^5.10.0"
+  }
 }

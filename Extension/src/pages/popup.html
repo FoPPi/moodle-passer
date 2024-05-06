@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Введення API ключа</title>
+  <link rel="stylesheet" href="../styles/popup.css">
+</head>
+
+<body>
+
+  <h2>Введіть ваш API ключ:</h2>
+
+  <p>Щоб отримати API ключ, зайдіть на сайт <a href="https://donatello.org" target="_blank">Donatello</a>.</p>
+  <p>Здійсніть пожертву від 100 грн. Після цього введіть свою електронну адресу на сайті.</p>
+  <p>Ключ буде відправлено вам на пошту. Введіть отриманий ключ у поле нижче.</p>
+
+
+  <input type="text" id="apiKeyInput" placeholder="API Key">
+
+  <section class="btns">
+    <button class="saveBtn" id="saveButton">Зберегти API ключ</button>
+  </section>
+
+  <p id="statusMessage"></p> <!-- Статусные сообщения сюда -->
+  <script src="../scripts/browser_polyfill.js"></script>
+  <script src="../scripts/popup.js"></script>
+</body>
+
+</html>

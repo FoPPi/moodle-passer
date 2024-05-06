@@ -12,13 +12,21 @@
   "action": {
     "default_popup": "./pages/popup.html"
   },
-  "permissions": ["storage"],
+  "background": {
+  },
+  "permissions": [
+    "storage", 
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*"
+  ],
   "content_scripts": [
     {
       "css": ["./styles/contentStyle.css"],
-      "js": ["./scripts/browser_polyfil.js", "./scripts/main.js"],
-      "matches": ["*://*.edu.ua/mod/quiz/*", "http://127.0.0.1:5500/*"],
-      "run_at": "document_start"
+      "js": ["./scripts/main.js"],
+      "matches": ["*://*.edu.ua/mod/quiz/*"],
+      "run_at": "document_idle"
     }
   ]
 }

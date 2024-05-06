@@ -4,10 +4,6 @@
 @api_key = your_actual_api_key_here
 @user_key = Enter_Key_Here_After_Generation
 
-### Generate User
-GET {{host}}/user/generate
-api_key: {{api_key}}
-
 ### Activate User
 POST {{host}}/user/activate
 Content-Type: application/json
