@@ -1,37 +1,73 @@
-// import { fetchJsonData } from "./api.js";
-import { addElement} from "./ui.js";
-import { getCleanText, copyToClipboard } from "./helpers.js";
-import { getAllTextData } from './dataProcessing.js';
-import { createToast, closeToast, showToast } from './toast.js';
+import { Button } from "./Button.js";
+import { Toast } from "./Toasts.js";
+import { getAllTextData, getAllTextInObj } from "./dataProcessing.js";
+import { copyToClipboard } from "./helpers.js";
 
+class Application {
+  constructor() {
+    this.isAutoPassEnabled = false;
+    this.toast = new Toast();
+  }
 
-function main() {
-    createToast();
-    
-    addElement("Скопіювати", () => {
-        console.log("Calling getAllTextData");
+  init() {
+    this.searchForAnswer();
+  }
+
+  searchForAnswer() {
+    if (!window.location.href.includes("attempt")) return;
+    const interval = setInterval(() => {
+      if (document.querySelector(".answer")) {
+        this.setupUI();
+        clearInterval(interval);
+      }
+    }, 500);
+  }
+
+  setupUI() {
+    new Button(
+      "Скопіювати",
+      () => {
         const textData = getAllTextData();
+        copyToClipboard(textData).then((success) => {
+          if (success) {
+            this.toast.show("Скопійовано у буфер обміну.", 3000);
+          } else {
+            this.toast.show("Помилка копіювання у буфер обміну.", 3000);
+          }
+        });
+      },
+      "copy"
+    ).render(document.querySelector(".answer"));
+
+    new Button(
+      "Автоматичне вирішення",
+      this.toggleAutoFlag.bind(this),
+      "autoModeButton"
+    ).render(document.querySelector(".answer"));
+
+    new Button(
+      "Вирішити через ГПТ",
+      () => {
+        const textData = getAllTextInObj();
         console.log("Text Data: ", textData);
-        copyToClipboard(textData);
-      }, "copy");
-}
+      },
+      "answerWithGpt"
+    ).render(document.querySelector(".answer"));
+  }
 
-
-// START APP
-
-function workInThisPage() {
-    return window.location.href.includes("attempt");
-}
-
-function searchForAnswer() {
-if (!workInThisPage()) return; 
-  const interval = setInterval(() => {
-    const answerElement = document.querySelector(".answer");
-    if (answerElement) {
-      main();
-      clearInterval(interval);
+  toggleAutoFlag() {
+    this.isAutoPassEnabled = !this.isAutoPassEnabled;
+    const button = document.querySelector("#autoModeButton");
+    if (button) {
+      button.textContent = this.isAutoPassEnabled
+        ? "Зупинити авто вирішення"
+        : "Автоматичне вирішення";
+      button.className = this.isAutoPassEnabled
+        ? "extention-custom-button custom-button-red"
+        : "extention-custom-button";
     }
-  }, 500);
+  }
 }
 
-searchForAnswer();
+const app = new Application();
+app.init();

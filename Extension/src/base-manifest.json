@@ -1,0 +1,25 @@
+{
+    "name": "Moodle passer",
+    "description": ":)",
+    "version": "0.0.4",
+    "manifest_version": "",
+    "icons": {
+      "16": "./icons/16.png",
+      "32": "./icons/32.png",
+      "48": "./icons/48.png",
+      "128": "./icons/128.png"
+    },
+    "permissions": [
+      "storage",
+      "activeTab"
+    ],
+    "content_scripts": [
+      {
+        "css": ["./styles/contentStyle.css"],
+        "js": ["./scripts/main.js"],
+        "matches": ["*://*.edu.ua/mod/quiz/*"],
+        "run_at": "document_idle"
+      }
+    ]
+  }
+  

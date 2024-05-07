@@ -1,3 +1,6 @@
+import { getCleanText } from './helpers.js';
+
+
 export function getQuestionText() {
     const questionElement = document.querySelector(".qtext");
     return questionElement ? questionElement.innerText.trim() : "";
@@ -26,4 +29,34 @@ export function getQuestionText() {
     }
     return fullText;
   }
+
+  export function getPromptType() {
+    const promptText = getPromptText();
+    if (promptText.includes("Виберіть одну відповідь:")) {
+      return 1;
+    } else if (promptText.includes("Виберіть одну або декілька відповідей:")) {
+      return 2;
+    } else {
+      return -1;
+    }
+  }
+
+
+  export function getTestType() {
+    return document.querySelector("h1").textContent;
+  }
   
+
+  export function getAllTextInObj(){
+    const question = getQuestionText();
+    const answers = getAllAnswers();
+    const testType = getTestType();
+    const prompt = getPromptType();
+    const data = {
+      test_type: testType,
+      question: getCleanText(question),
+      prompt: prompt,
+      answers: answers,
+    };
+    return data;
+  }

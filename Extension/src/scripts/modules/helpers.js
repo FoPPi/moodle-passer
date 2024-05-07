@@ -1,5 +1,3 @@
-import { showToast } from './toast.js';
-
 export function getCleanText(text) {
     text = text.replace(/\n+/g, " ");
     text = text.replace(/\btest\b/gi, "t est");
@@ -7,14 +5,13 @@ export function getCleanText(text) {
 }
 
 export function copyToClipboard(text) {
-    navigator.clipboard
-        .writeText(text)
+    return navigator.clipboard.writeText(text)
         .then(() => {
             console.log("Copied to clipboard successfully.");
-            showToast("Скопійовано у буфер обміну.", 3000);
+            return true; 
         })
         .catch((err) => {
             console.error("Failed to copy to clipboard:", err);
-            showToast("Помилка копіювання у буфер обміну.", 3000);
+            return false; 
         });
 }
