@@ -1,36 +1,41 @@
-document.addEventListener('DOMContentLoaded', function () {
+import browser from 'webextension-polyfill';
+
+document.addEventListener('DOMContentLoaded', async function () {
   const saveButton = document.getElementById('saveButton');
   const apiKeyInput = document.getElementById('apiKeyInput');
-  const statusMessage = document.getElementById('statusMessage'); // Элемент для отображения статусных сообщений
+  const statusMessage = document.getElementById('statusMessage');
 
-  // Запрос текущего значения API ключа при загрузке
-  browser.runtime.sendMessage({action: 'getApiKey'}).then(response => {
-      if (response.status === 'success' && response.apiKey) {
-          apiKeyInput.value = response.apiKey;
-          apiKeyInput.disabled = true; // Блокировать изменение если ключ уже сохранен
-          saveButton.disabled = true; // Блокировать кнопку если ключ уже сохранен
-          statusMessage.textContent = 'API ключ уже активирован и сохранен.';
-      }
-  });
+  try {
+    const response = await browser.runtime.sendMessage({action: 'getApiKey'});
+    if (response && response.status === 'success' && response.apiKey) {
+      apiKeyInput.value = response.apiKey;
+      apiKeyInput.disabled = true;
+      saveButton.disabled = true;
+      statusMessage.textContent = 'API ключ уже активовано і збережено.';
+    }
+  } catch (error) {
+    statusMessage.textContent = 'Помилка під час отримання API ключа: ' + error.message;
+  }
 
-  saveButton.addEventListener('click', function () {
-      const userKey = apiKeyInput.value;
-      if (!userKey) {
-          statusMessage.textContent = 'Пожалуйста, введите API ключ.';
-          return;
+  saveButton.addEventListener('click', async function () {
+    statusMessage.textContent = 'Зачекайте...';
+    const userKey = apiKeyInput.value.trim();
+    if (!userKey) {
+      statusMessage.textContent = 'Будь ласка, введіть API ключ.';
+      return;
+    }
+    
+    try {
+      const response = await browser.runtime.sendMessage({action: 'activateUser', userKey: userKey});
+      if (response && response.status === 'success') {
+        statusMessage.textContent = 'API ключ успішно активовано та збережено.';
+        apiKeyInput.disabled = true;
+        saveButton.disabled = true;
+      } else {
+        statusMessage.textContent = 'Помилка активації: ' + (response.message || 'Невідома помилка');
       }
-      
-      // Отправка сообщения для активации ключа
-      browser.runtime.sendMessage({action: 'activateUser', userKey: userKey}).then(response => {
-          if (response.status === 'success') {
-              statusMessage.textContent = 'API ключ успешно активирован и сохранен.';
-              apiKeyInput.disabled = true;
-              saveButton.disabled = true;
-          } else {
-              statusMessage.textContent = 'Ошибка активации: ' + response.message;
-              apiKeyInput.disabled = false;
-              saveButton.disabled = false;
-          }
-      });
+    } catch (error) {
+      statusMessage.textContent = 'Помилка активації: ' + error.message;
+    }
   });
 });

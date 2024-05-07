@@ -1,7 +1,7 @@
-import { Button } from "./Button.js";
-import { Toast } from "./Toasts.js";
-import { getAllTextData, getAllTextInObj } from "./dataProcessing.js";
-import { copyToClipboard } from "./helpers.js";
+import { Button } from "./modules/Button.js";
+import { Toast } from "./modules/Toasts.js";
+import { getAllTextData, getAllTextInObj } from "./modules/dataProcessing.js";
+import { copyToClipboard } from "./modules/helpers.js";
 
 class Application {
   constructor() {

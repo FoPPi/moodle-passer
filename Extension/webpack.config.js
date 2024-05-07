@@ -79,10 +79,11 @@ fs.writeFileSync(manifestPath, manifest);
 
 module.exports = {
   mode: process.env.NODE_ENV,
+  devtool: 'source-map',
   entry: {
     background: './src/scripts/background.js',
     popup: './src/scripts/popup.js',
-    main: './src/scripts/modules/main.js'
+    main: './src/scripts/main.js'
   },
   output: {
     path: path.resolve(browserDir, 'scripts'), 
