@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-
+import "../styles/content.css";
 import { Button } from "./modules/Button.js";
 import { Toast } from "./modules/Toasts.js";
 import {
@@ -12,44 +12,68 @@ import { copyToClipboard } from "./modules/helpers.js";
 
 class Application {
   constructor() {
+    this.autoPassObj;
     this.isAutoPassEnabled = false;
     this.toast = new Toast();
     this.userKey = "";
-
+    this.clickDelayInSec = 5;
+    this.attempt;
   }
 
-  async  init() {
+  async init() {
     this.searchForAnswer();
-    const autoPassResponse = await getAutoPassEnabled();
-    if (autoPassResponse.status === 'success') {
-      this.isAutoPassEnabled = autoPassResponse.isAutoPassEnabled;
+  }
+
+  updateAutoPassButton() {
+    const button = document.querySelector("#autoModeButton");
+    if (button) {
+      button.textContent = this.isAutoPassEnabled
+        ? "Зупинити авто вирішення"
+        : "Автоматичне вирішення";
+      button.className = this.isAutoPassEnabled
+        ? "extention-custom-button custom-button-red"
+        : "extention-custom-button";
     }
   }
 
   toggleAutoFlag() {
     this.isAutoPassEnabled = !this.isAutoPassEnabled;
-    setAutoPassEnabled(this.isAutoPassEnabled).then(response => {
+    this.setAutoPassEnabled(this.isAutoPassEnabled).then((response) => {
       console.log(response.message);
+      this.updateAutoPassButton();
 
-      const button = document.querySelector("#autoModeButton");
-  if (button) {
-    button.textContent = this.isAutoPassEnabled
-      ? "Зупинити авто вирішення"
-      : "Автоматичне вирішення";
-    button.className = this.isAutoPassEnabled
-      ? "extention-custom-button custom-button-red"
-      : "extention-custom-button";
-  }
-  if (this.isAutoPassEnabled) {
-    this.handleGptRequest();
+      this.toast.show(`${this.isAutoPassEnabled ? "Автоматичний режим активовано." : "Автоматичний режим деактивовано."}`);
+  
+      if (this.isAutoPassEnabled) {
+        this.handleGptRequest();
+      }
+    }).catch(error => {
+      console.error("Error toggling auto flag:", error);
+    });;
   }
 
-    
-  });}
+  async searchForAnswer() {
+    if (
+      window.location.href.includes("summary") ||
+      window.location.href.includes("view")
+    ) {
+      const autoPassResponse = await this.getAutoPassEnabled();
+      if (autoPassResponse.status === "success") {
+        this.autoPassObj = autoPassResponse.autoPassObj;
+        this.isAutoPassEnabled = this.autoPassObj.isAutoPassEnabled;
+      }
 
-  searchForAnswer() {
+      if (this.isAutoPassEnabled) {
+        this.deleteAutoPassEnabled();
+        this.toast.show("Автоматичний режим деактивовано.")
+        this.isAutoPassEnabled = false;
+      }
+
+      return;
+    }
     if (!window.location.href.includes("attempt")) return;
-    const interval = setInterval(() => {
+    this.attempt = new URL(window.location.href).searchParams.get("attempt");
+    const interval = setInterval(async () => {
       if (document.querySelector(".answer")) {
         this.setupUI();
         clearInterval(interval);
@@ -66,27 +90,39 @@ class Application {
   }
 
   selectAnswers(answersArray, promptType) {
-    console.log(answersArray, promptType);
+    // console.log(answersArray, promptType);
     const inputs = document.querySelectorAll(".answer input");
     let isAnswered = false;
-  
+
     inputs.forEach((input) => {
       const label = input.nextElementSibling;
-      const labelText = label ? label.innerText.trim().replace(/\s+/g, ' ').toLowerCase() : null;
-  
-      console.log(labelText);
-  
+      const labelText = label
+        ? label.innerText.trim().replace(/\s+/g, " ").toLowerCase()
+        : null;
+
+      // console.log(labelText);
+
       switch (promptType) {
         case 1:
           input.checked = false;
-          if (input.type === "radio" && answersArray.some(answer => this.compareAnswers(answer.toLowerCase(), labelText))) {
+          if (
+            input.type === "radio" &&
+            answersArray.some((answer) =>
+              this.compareAnswers(answer.toLowerCase(), labelText)
+            )
+          ) {
             input.checked = true;
             isAnswered = true;
           }
           break;
         case 2:
           input.checked = false;
-          if (input.type === "checkbox" && answersArray.some(answer => this.compareAnswers(answer.toLowerCase(), labelText))) {
+          if (
+            input.type === "checkbox" &&
+            answersArray.some((answer) =>
+              this.compareAnswers(answer.toLowerCase(), labelText)
+            )
+          ) {
             input.checked = true;
             isAnswered = true;
           }
@@ -100,25 +136,23 @@ class Application {
           break;
       }
     });
-  
-    console.log(`isAnswered: ${isAnswered}`);
-    if (isAnswered) {
+
+    // console.log(`isAnswered: ${isAnswered}`);
+    if (isAnswered && this.isAutoPassEnabled) {
       this.ensureButtonClick();
     }
   }
-  
+
   compareAnswers(answer, labelText) {
     return labelText.startsWith(answer) || labelText === answer;
   }
-  
-  
 
   ensureButtonClick() {
     const nextButton = document.querySelector(".mod_quiz-next-nav");
 
     if (nextButton) {
       if (!nextButton.disabled && nextButton.offsetParent !== null) {
-        nextButton.click();
+        setTimeout(() => nextButton.click(), this.clickDelayInSec * 1000);
       } else {
         setTimeout(ensureButtonClick, 500);
       }
@@ -141,7 +175,10 @@ class Application {
 
       if (response && response.success) {
         console.log("Text Data: ", response.data);
-        this.selectAnswers(this.processResponse(response.data), getPromptType());
+        this.selectAnswers(
+          this.processResponse(response.data),
+          getPromptType()
+        );
         this.toast.show(`Данні отриманно. відповідь: ${response.data}`, 5000);
       } else {
         this.toast.show(
@@ -174,9 +211,7 @@ class Application {
     const response = await this.getApiKey();
     if (response && response.status === "success" && response.apiKey) {
       this.userKey = response.apiKey;
-      if (this.isAutoPassEnabled) {
-        this.handleGptRequest();
-      }
+
       new Button(
         "Автоматичне вирішення",
         this.toggleAutoFlag.bind(this),
@@ -187,6 +222,20 @@ class Application {
         this.handleGptRequest.bind(this),
         "answerWithGpt"
       ).render(document.querySelector(".answer"));
+
+      const autoPassResponse = await this.getAutoPassEnabled();
+      if (autoPassResponse.status === "success") {
+        console.log(autoPassResponse);
+        this.autoPassObj = autoPassResponse.autoPassObj;
+        console.log(autoPassResponse.autoPassObj);
+        this.isAutoPassEnabled = this.autoPassObj.isAutoPassEnabled;
+      }
+
+      this.updateAutoPassButton();
+
+      if (this.isAutoPassEnabled && this.attempt === this.autoPassObj.attempt) {
+        this.handleGptRequest();
+      }
     }
   }
 
@@ -199,7 +248,50 @@ class Application {
     }
   }
 
+  async deleteAutoPassEnabled() {
+    try {
+      return await browser.runtime.sendMessage({
+        action: "deleteAutoPassEnabled",
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      return null;
+    }
+  }
+  async setAutoPassEnabled(isAutoPassEnabled) {
+    try {
+      return await browser.runtime.sendMessage({
+        autoPassObj: {
+          attempt: this.attempt,
+          isAutoPassEnabled: isAutoPassEnabled,
+        },
+        action: "setAutoPassEnabled",
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      return null;
+    }
+  }
+  async getAutoPassEnabled() {
+    try {
+      return await browser.runtime.sendMessage({
+        action: "getAutoPassEnabled",
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      return null;
+    }
+  }
 }
 
 const app = new Application();
 app.init();
+
+browser.storage.onChanged.addListener((changes, area) => {
+  if (changes.autoPassObj && area === "sync") { 
+    console.log("Auto-pass settings changed:", changes.autoPassObj.newValue);
+    app.isAutoPassEnabled = changes.autoPassObj.newValue.isAutoPassEnabled;
+    app.updateAutoPassButton(); 
+  }
+});
+

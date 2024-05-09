@@ -46,7 +46,7 @@ body {
   color: var(--second-color);
 }
 
-input[type="text"] {
+.input{
   width: var(--input-width);
   padding: var(--input-padding);
   margin: var(--input-margin);

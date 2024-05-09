@@ -3,6 +3,8 @@ const fs = require('fs');
 const CopyPlugin = require('copy-webpack-plugin');
 const archiver = require('archiver');
 const webpack = require('webpack');
+const { SERVER_LINK, API_KEY } = require('./config'); 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
 function createArchive(browserDir) {
@@ -41,9 +43,6 @@ class ArchivePlugin {
     });
   }
 }
-
-// const SERVER_LINK = "http://127.0.0.1:8000";
-// const API_KEY="key_here"
 
 const baseManifestPath = path.resolve(__dirname, 'src', 'base-manifest.json');
 const baseManifest = JSON.parse(fs.readFileSync(baseManifestPath, 'utf8'));
@@ -85,7 +84,7 @@ module.exports = {
   entry: {
     background: './src/scripts/background.js',
     popup: './src/scripts/popup.js',
-    main: './src/scripts/main.js'
+    content: './src/scripts/content.js'
   },
   output: {
     path: path.resolve(browserDir, 'scripts'),
@@ -106,7 +105,10 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [  MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'  
+        ]
       }
     ]
   },
@@ -123,8 +125,12 @@ module.exports = {
         { from: manifestPath, to: path.resolve(browserDir, 'manifest.json') }
       ]
     }),
-    new ArchivePlugin()
+    new ArchivePlugin(),
+    new MiniCssExtractPlugin({
+      filename: '../styles/[name].css', 
+    }),
   ],
+
 };
 
 

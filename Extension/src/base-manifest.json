@@ -15,9 +15,9 @@
     ],
     "content_scripts": [
       {
-        "css": ["./styles/contentStyle.css"],
-        "js": ["./scripts/main.js"],
-        "matches": ["*://*.edu.ua/mod/quiz/*"],
+        "css": ["./styles/content.css"],
+        "js": ["./scripts/content.js"],
+        "matches": ["*://*.edu.ua/mod/quiz/*","*://*.edu.ua/moodle/mod/quiz/*"],
         "run_at": "document_idle"
       }
     ]

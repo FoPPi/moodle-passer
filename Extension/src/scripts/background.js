@@ -57,7 +57,8 @@ async function gptRequestHandler(userKey, data) {
 async function activateUserHandler(userKey) {
   try {
     const response = await fetchAPI("/user/activate", "POST", userKey);
-    if (response.success) {
+    console.log(response);
+    if (response) {
       await browser.storage.sync.set({ apiKey: userKey });
       return { status: 'success', message: 'API Key saved and activated' };
     } else {
@@ -92,8 +93,12 @@ async function getApiKeyHandler() {
 
 async function getAutoPassEnabled() {
   try {
-    const result = await browser.storage.sync.get('isAutoPassEnabled');
-    return { status: 'success', isAutoPassEnabled: result.isAutoPassEnabled || false };
+    const result = await browser.storage.sync.get('autoPassObj');
+    if (result.autoPassObj) {
+      return { status: 'success', autoPassObj: result.autoPassObj };
+    } else {
+      return { status: 'success', autoPassObj: { isAutoPassEnabled: false, attempt: null } };
+    }
   } catch (error) {
     console.error("Error retrieving the auto-pass flag:", error);
     return { status: 'error', message: `Error retrieving the auto-pass flag: ${error.message}` };
@@ -102,8 +107,10 @@ async function getAutoPassEnabled() {
 
 
 async function setAutoPassEnabled(value) {
+  console.log(value);
   try {
-    await browser.storage.sync.set({ isAutoPassEnabled: value });
+    await browser.storage.sync.set({autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt }});
+    console.log({autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt }});
     return { status: 'success', message: 'Auto-pass flag set' };
   } catch (error) {
     console.error("Error setting the auto-pass flag:", error);
@@ -113,7 +120,7 @@ async function setAutoPassEnabled(value) {
 
 async function deleteAutoPassEnabled() {
   try {
-    await browser.storage.sync.remove('isAutoPassEnabled');
+    await browser.storage.sync.remove('autoPassObj');
     return { status: 'success', message: 'Auto-pass flag deleted' };
   } catch (error) {
     console.error("Error deleting the auto-pass flag:", error);
@@ -138,6 +145,16 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case "gptRequest":
       gptRequestHandler(message.userKey, message.data).then(response => sendResponse(response));
       break;
+    case "getAutoPassEnabled":
+      getAutoPassEnabled().then(response => sendResponse(response));
+      break;
+    case "setAutoPassEnabled":
+      setAutoPassEnabled(message.autoPassObj).then(response => sendResponse(response));
+      break;
+    case "deleteAutoPassEnabled":
+      deleteAutoPassEnabled().then(response => sendResponse(response));
+      break;
+
   }
   return true; 
 });

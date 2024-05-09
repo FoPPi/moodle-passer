@@ -1,4 +1,6 @@
 import browser from 'webextension-polyfill';
+import '../styles/popup.css';
+
 
 document.addEventListener('DOMContentLoaded', async function () {
   const saveButton = document.getElementById('saveButton');

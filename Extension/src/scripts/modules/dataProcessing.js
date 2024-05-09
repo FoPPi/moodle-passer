@@ -1,4 +1,8 @@
-import { getCleanText } from './helpers.js';
+export function getCleanText(text) {
+  text = text.replace(/\n+/g, " ");
+  text = text.replace(/\btest\b/gi, "t est");
+  return text;
+}
 
 
 export function getQuestionText() {

@@ -1,9 +1,3 @@
-export function getCleanText(text) {
-    text = text.replace(/\n+/g, " ");
-    text = text.replace(/\btest\b/gi, "t est");
-    return text;
-}
-
 export function copyToClipboard(text) {
     return navigator.clipboard.writeText(text)
         .then(() => {
