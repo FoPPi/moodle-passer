@@ -1,0 +1,107 @@
+:root {
+  --black: #101d1c;
+  --second-color: #dddddd;
+  --input-border-color: #ccc;
+  --btn-padding: 10px 20px;
+  --btn-background-color: #4CAF50;
+  --btn-hover-background-color: #285f2b;
+  --success-background-color: #437e43;
+  --success-color: #e7f1e9;
+  --transition-duration: 0.2s;
+  --body-padding: 20px 0;
+  --body-width: 500px;
+  --input-padding: 8px;
+  --input-margin: 10px 0;
+  --input-width: 80%;
+  --btns-gap: 10px;
+  --btns-width: 80%;
+  --btn-border-radius: 4px;
+  --link-color: #5599ff;
+  --link-hover-color: #3377dd;
+  --text-padding: 5px;
+  --text-margin: 5px 0;
+}
+
+
+* {
+  transition: all var(--transition-duration);
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding: var(--body-padding);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 500;
+  text-align: center;
+  width: var(--body-width);
+  font-size: medium;
+  background-color: var(--black);
+  color: var(--second-color);
+}
+
+.input{
+  width: var(--input-width);
+  padding: var(--input-padding);
+  margin: var(--input-margin);
+  border: 1px solid var(--input-border-color);
+}
+
+.input-success {
+  background-color: var(--success-background-color);
+  color: var(--success-color);
+}
+
+.btns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--btns-gap);
+  width: var(--btns-width);
+}
+
+button {
+  padding: var(--btn-padding);
+  border: none;
+  border-radius: var(--btn-border-radius);
+  cursor: pointer;
+}
+
+.saveBtn {
+  background-color: var(--btn-background-color);
+  color: white;
+}
+
+.saveBtn:hover {
+  background-color: var(--btn-hover-background-color);
+}
+
+.saveBtn:disabled{
+  background-color: #8ba08b;
+  color: gray;
+}
+
+
+p {
+  text-align: start;
+  width: 80%;
+  padding: var(--text-padding);
+  margin: var(--text-margin);
+  color: var(--second-color);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline; 
+}
