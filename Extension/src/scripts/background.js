@@ -25,6 +25,7 @@ function fetchAPI(endpoint, method, userKey, data) {
 
   return fetch(url, fetchOptions)
     .then(response => {
+      console.log(response);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -44,7 +45,7 @@ async function gptRequestHandler(userKey, data) {
     if (response.error) {
       return { success: false, message: response.message };
     }
-    if(response.answer.trim() === ''){
+    if (response.answer.trim() === '') {
       return { success: false, message: "Чат ГПТ не знає відповідь" };
     }
     return { success: true, data: response.answer };
@@ -58,7 +59,7 @@ async function activateUserHandler(userKey) {
   try {
     const response = await fetchAPI("/user/activate", "POST", userKey);
     console.log(response);
-    if (response) {
+    if (!response.error) {
       await browser.storage.sync.set({ apiKey: userKey });
       return { status: 'success', message: 'API Key saved and activated' };
     } else {
@@ -109,8 +110,8 @@ async function getAutoPassEnabled() {
 async function setAutoPassEnabled(value) {
   console.log(value);
   try {
-    await browser.storage.sync.set({autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt }});
-    console.log({autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt }});
+    await browser.storage.sync.set({ autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt } });
+    console.log({ autoPassObj: { isAutoPassEnabled: value.isAutoPassEnabled, attempt: value.attempt } });
     return { status: 'success', message: 'Auto-pass flag set' };
   } catch (error) {
     console.error("Error setting the auto-pass flag:", error);
@@ -156,6 +157,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
   }
-  return true; 
+  return true;
 });
 
