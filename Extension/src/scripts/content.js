@@ -42,7 +42,7 @@ class Application {
     this.isAutoPassEnabled = !this.isAutoPassEnabled;
     this.setAutoPassEnabled(this.isAutoPassEnabled)
       .then((response) => {
-        console.log(response.message);
+        // console.log(response.message);
         this.updateAutoPassButton();
 
         this.toast.show(
@@ -100,7 +100,7 @@ class Application {
   }
 
   selectAnswers(answersArray, promptType) {
-    // console.log(answersArray, promptType);
+    console.log(answersArray, promptType);
     const inputs = document.querySelectorAll(".answer input");
     let isAnswered = false;
 
@@ -109,8 +109,6 @@ class Application {
       const labelText = label
         ? label.innerText.trim().replace(/\s+/g, " ").toLowerCase()
         : null;
-
-      // console.log(labelText);
 
       switch (promptType) {
         case 1:
@@ -184,12 +182,12 @@ class Application {
       this.toast.close();
 
       if (response && response.success) {
-        console.log("Text Data: ", response.data);
+        // console.log("Text Data: ", response.data);
         this.selectAnswers(
           this.processResponse(response.data),
           getPromptType()
         );
-        this.toast.show(`Данні отриманно. відповідь: ${response.data}`, 5000);
+        this.toast.show(`Данні отриманно. відповідь: ${response.data}`, 0);
       } else {
         this.toast.show(
           `Помилка отримання данних: ${response.message || "невідома помилка"}`,
@@ -232,9 +230,9 @@ class Application {
 
       const autoPassResponse = await this.getAutoPassEnabled();
       if (autoPassResponse.status === "success") {
-        console.log(autoPassResponse);
+        // console.log(autoPassResponse);
         this.autoPassObj = autoPassResponse.autoPassObj;
-        console.log(autoPassResponse.autoPassObj);
+        // console.log(autoPassResponse.autoPassObj);
         this.isAutoPassEnabled = this.autoPassObj.isAutoPassEnabled;
       }
 
@@ -275,6 +273,10 @@ class Application {
     if (this.answerWithGptButton) {
       this.answerWithGptButton.disable();
     }
+  }
+
+  offGptBtns(){
+    this.disableGptBtns();
 
     this.autoPassObj = null; // Clear autoPassObj
     this.isAutoPassEnabled = false; // Disable auto-solve
@@ -337,12 +339,12 @@ browser.storage.onChanged.addListener((changes, area) => {
         app.userKey = changes.apiKey.newValue;
         app.enableGptBtns();
       } else {
-        app.disableGptBtns();
+        app.offGptBtns();
       }
     }
 
     if (changes.autoPassObj) {
-      console.log("Auto-pass settings changed:", changes.autoPassObj.newValue);
+      // console.log("Auto-pass settings changed:", changes.autoPassObj.newValue);
       app.isAutoPassEnabled = changes.autoPassObj.newValue.isAutoPassEnabled;
       app.updateAutoPassButton();
     }
