@@ -8,11 +8,6 @@ Before you can run the builder script, ensure Node.js and npm (Node Package Mana
 
 Once Node.js is installed, navigate to the root of your project directory in a terminal and install the necessary dependencies by running:
 
-```shell
-npm install
-```
-
-OR
 
 ```shell
 npm ci
@@ -27,6 +22,29 @@ npm ci
   - `scripts/`: JavaScript files.
   - `icons/`: Directory containing image files used as icons.
 - `dist/`: Directory where the Webpack outputs the build files for distribution.
+- `config.js`: Configuration file for setting environment-specific variables.
+
+## Creating the `config.js` File
+
+To allow Webpack to select the appropriate host and links for production and development environments, create a `config.js` file in the root directory with the following content:
+
+```javascript
+const devConfig = {
+  SERVER_LINK: "http://localhost:8000",
+  API_KEY: "dev-1234-5678"
+};
+
+const prodConfig = {
+  SERVER_LINK: "http://production.server.com",
+  API_KEY: "prod-8765-4321"
+};
+
+const config = process.env.NODE_ENV === 'production' ? prodConfig : devConfig;
+
+module.exports = config;
+```
+
+This configuration ensures that Webpack uses the correct server link and API key depending on whether you are in a development or production environment.
 
 ## How to Use
 

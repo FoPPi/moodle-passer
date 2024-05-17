@@ -12,12 +12,14 @@ import { copyToClipboard } from "./modules/helpers.js";
 
 class Application {
   constructor() {
-    this.autoPassObj;
+    this.autoPassObj = null;
     this.isAutoPassEnabled = false;
     this.toast = new Toast();
     this.userKey = "";
     this.clickDelayInSec = 5;
-    this.attempt;
+    this.attempt = null;
+    this.autoModeButton = null;
+    this.answerWithGptButton = null;
   }
 
   async init() {
@@ -38,18 +40,26 @@ class Application {
 
   toggleAutoFlag() {
     this.isAutoPassEnabled = !this.isAutoPassEnabled;
-    this.setAutoPassEnabled(this.isAutoPassEnabled).then((response) => {
-      console.log(response.message);
-      this.updateAutoPassButton();
+    this.setAutoPassEnabled(this.isAutoPassEnabled)
+      .then((response) => {
+        console.log(response.message);
+        this.updateAutoPassButton();
 
-      this.toast.show(`${this.isAutoPassEnabled ? "Автоматичний режим активовано." : "Автоматичний режим деактивовано."}`);
-  
-      if (this.isAutoPassEnabled) {
-        this.handleGptRequest();
-      }
-    }).catch(error => {
-      console.error("Error toggling auto flag:", error);
-    });;
+        this.toast.show(
+          `${
+            this.isAutoPassEnabled
+              ? "Автоматичний режим активовано."
+              : "Автоматичний режим деактивовано."
+          }`
+        );
+
+        if (this.isAutoPassEnabled) {
+          this.handleGptRequest();
+        }
+      })
+      .catch((error) => {
+        console.error("Error toggling auto flag:", error);
+      });
   }
 
   async searchForAnswer() {
@@ -65,7 +75,7 @@ class Application {
 
       if (this.isAutoPassEnabled) {
         this.deleteAutoPassEnabled();
-        this.toast.show("Автоматичний режим деактивовано.")
+        this.toast.show("Автоматичний режим деактивовано.");
         this.isAutoPassEnabled = false;
       }
 
@@ -183,11 +193,11 @@ class Application {
       } else {
         this.toast.show(
           `Помилка отримання данних: ${response.message || "невідома помилка"}`,
-          5000
+          0
         );
       }
     } catch (error) {
-      this.toast.show(`Помилка отримання данних: ${error.message}`, 5000);
+      this.toast.show(`Помилка отримання данних: ${error.message}`, 0);
       console.error("Error: ", error);
     }
   }
@@ -209,19 +219,16 @@ class Application {
     ).render(document.querySelector(".answer"));
 
     const response = await this.getApiKey();
+
+    this.createGptBtns();
+
+    this.disableGptBtns();
+
+
     if (response && response.status === "success" && response.apiKey) {
       this.userKey = response.apiKey;
 
-      new Button(
-        "Автоматичне вирішення",
-        this.toggleAutoFlag.bind(this),
-        "autoModeButton"
-      ).render(document.querySelector(".answer"));
-      new Button(
-        "Вирішити через ГПТ",
-        this.handleGptRequest.bind(this),
-        "answerWithGpt"
-      ).render(document.querySelector(".answer"));
+      this.enableGptBtns();
 
       const autoPassResponse = await this.getAutoPassEnabled();
       if (autoPassResponse.status === "success") {
@@ -237,6 +244,42 @@ class Application {
         this.handleGptRequest();
       }
     }
+  }
+
+  enableGptBtns() {
+    if (this.autoModeButton) {
+      this.autoModeButton.enable();
+    }
+    if (this.answerWithGptButton) {
+      this.answerWithGptButton.enable();
+    }
+  }
+
+  createGptBtns() {
+    this.autoModeButton = new Button("Автоматичне вирішення", this.toggleAutoFlag.bind(this), "autoModeButton", this.showApiKeyToast.bind(this));
+    this.autoModeButton.render(document.querySelector(".answer"));
+  
+    this.answerWithGptButton = new Button("Вирішити через ГПТ", this.handleGptRequest.bind(this), "answerWithGpt", this.showApiKeyToast.bind(this));
+    this.answerWithGptButton.render(document.querySelector(".answer"));
+  }
+  
+  showApiKeyToast() {
+    this.toast.close();
+    this.toast.show("Для використання цієї функції купіть API-ключ.", 3000);
+  }
+
+  disableGptBtns() {
+    if (this.autoModeButton) {
+      this.autoModeButton.disable();
+    }
+    if (this.answerWithGptButton) {
+      this.answerWithGptButton.disable();
+    }
+
+    this.autoPassObj = null; // Clear autoPassObj
+    this.isAutoPassEnabled = false; // Disable auto-solve
+    this.deleteAutoPassEnabled();
+    this.updateAutoPassButton(); // Update button state
   }
 
   async getApiKey() {
@@ -288,10 +331,20 @@ const app = new Application();
 app.init();
 
 browser.storage.onChanged.addListener((changes, area) => {
-  if (changes.autoPassObj && area === "sync") { 
-    console.log("Auto-pass settings changed:", changes.autoPassObj.newValue);
-    app.isAutoPassEnabled = changes.autoPassObj.newValue.isAutoPassEnabled;
-    app.updateAutoPassButton(); 
+  if (area === "sync") {
+    if (changes.apiKey) {
+      if (changes.apiKey.newValue) {
+        app.userKey = changes.apiKey.newValue;
+        app.enableGptBtns();
+      } else {
+        app.disableGptBtns();
+      }
+    }
+
+    if (changes.autoPassObj) {
+      console.log("Auto-pass settings changed:", changes.autoPassObj.newValue);
+      app.isAutoPassEnabled = changes.autoPassObj.newValue.isAutoPassEnabled;
+      app.updateAutoPassButton();
+    }
   }
 });
-

@@ -1,7 +1,7 @@
 {
     "name": "Moodle passer",
-    "description": ":)",
-    "version": "0.0.4",
+    "description": "Додає кнопки копіювання та вирішення через гпт в тестах moodle ",
+    "version": "0.0.5",
     "manifest_version": "",
     "icons": {
       "16": "./icons/16.png",
