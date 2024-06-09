@@ -17,14 +17,38 @@
 
   <p>Як отримати API ключ читайте <a href="https://docs.google.com/document/d/1cnuj94szCfDD35Mymhz8UWVYfX4s16HbHuyJo9OVclA/edit?usp=sharing" target="_blank">тут</a>.</p>
 
-
   <input class="input" type="text" id="apiKeyInput" placeholder="API Key">
 
   <section class="btns">
-    <button class="saveBtn" id="saveButton">Зберегти API ключ</button>
+    <button class="saveBtn" id="saveButton">Зберегти ключ</button>
   </section>
 
   <p id="statusMessage"></p>
+
+  <h3>Виберіть провайдера:</h3>
+  <select id="providerSelect">
+    <option value="ourServer">Наш сервер</option>
+    <option value="localServer">Локальний сервер</option>
+  </select>
+
+  <div id="localSettings" style="display: none;">
+    <h3>Налаштування локального сервера:</h3>
+    <input class="input" type="text" id="localModel" placeholder="Модель">
+    <input class="input" type="text" id="localPort" placeholder="Порт">
+  </div>
+
+
+  <br>
+
+  
+  <section class="btns">
+    <button class="saveBtn" id="saveConfigButton">Зберегти налаштування</button>
+  </section>
+
+  <p id="ConfigStatusMessage"></p>
+
+
+
 
   <!-- <p>Введіть кількість секунд для затримки автоматичного вірішення:</p>
   <input class="input" type="number" id="delay" min="5" max="150" placeholder="5"> -->

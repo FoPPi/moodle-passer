@@ -81,6 +81,18 @@ class Application {
 
       return;
     }
+
+    //for local tests of moodle pages 
+    if (window.location.hostname === "127.0.0.1"){
+      const interval = setInterval(async () => {
+        if (document.querySelector(".answer")) {
+          this.setupUI();
+          clearInterval(interval);
+        }
+      }, 500);
+      return;
+    }
+
     if (!window.location.href.includes("attempt")) return;
     this.attempt = new URL(window.location.href).searchParams.get("attempt");
     const interval = setInterval(async () => {
@@ -171,6 +183,7 @@ class Application {
 
   async handleGptRequest() {
     const textData = getAllTextInObj();
+    console.log(textData);
     this.toast.show("Зачекайте, йде обробка даних...", 0);
     try {
       const response = await browser.runtime.sendMessage({

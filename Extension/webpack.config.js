@@ -3,7 +3,7 @@ const fs = require('fs');
 const CopyPlugin = require('copy-webpack-plugin');
 const archiver = require('archiver');
 const webpack = require('webpack');
-const { SERVER_LINK, API_KEY } = require('./config'); 
+const {SERVER_LINK_LOCAL, SERVER_LINK, API_KEY } = require('./config'); 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
@@ -58,12 +58,12 @@ function modifyManifest(browser) {
     };
     manifest['background'] = { "scripts": ["./scripts/background.js"] };
     manifest['browser_action'] = { "default_popup": "./pages/popup.html" };
-    manifest['permissions'] = [...manifest.permissions, `${SERVER_LINK}/*`];
+    manifest['permissions'] = [...manifest.permissions, `${SERVER_LINK}/*, ${SERVER_LINK_LOCAL}`];
   } else {
     manifest['manifest_version'] = 3;
     manifest['action'] = { "default_popup": "./pages/popup.html" };
     manifest['background'] = { "service_worker": "./scripts/background.js" };
-    manifest['host_permissions'] = [`${SERVER_LINK}/*`];
+    manifest['host_permissions'] = [`${SERVER_LINK}/*, ${SERVER_LINK_LOCAL}`];
   }
   return JSON.stringify(manifest, null, 2);
 }

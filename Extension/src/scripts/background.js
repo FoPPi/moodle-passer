@@ -4,14 +4,23 @@ const serverLink = process.env.SERVER_LINK;
 const apiKey = process.env.API_KEY;
 
 async function fetchAPI(endpoint, method, userKey, data) {
-  const url = `${serverLink}${endpoint}`;
+  const settings = await browser.storage.sync.get(['provider', 'localModel', 'localPort']);
+
+  let url = `${serverLink}${endpoint}`;
   const headers = new Headers({
     "Content-Type": "application/json",
-    "X-Api-Key": apiKey,
   });
 
-  if (userKey) {
-    headers.append("X-User-Key", userKey);
+
+  if (settings.provider === 'localServer' && endpoint === "/") {
+    url = `http://localhost:${settings.localPort}/api/generate`;
+    data = { model: settings.localModel, prompt: {...data}, format: "json", stream: false};
+  } else {
+    url = `${serverLink}${endpoint}`;
+    headers.append("X-Api-Key", apiKey);
+    if (userKey) {
+      headers.append("X-User-Key", userKey);
+    }
   }
 
   const fetchOptions = {
@@ -19,9 +28,13 @@ async function fetchAPI(endpoint, method, userKey, data) {
     headers: headers,
   };
 
+
+
   if (data) {
     fetchOptions.body = JSON.stringify(data);
   }
+
+  console.log(fetchOptions)
 
   try {
     const response = await fetch(url, fetchOptions);

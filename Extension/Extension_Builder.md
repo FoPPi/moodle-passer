@@ -31,11 +31,14 @@ To allow Webpack to select the appropriate host and links for production and dev
 ```javascript
 const devConfig = {
   SERVER_LINK: "http://localhost:8000",
+  SERVER_LINK_LOCAL: "http://localhost/*",
   API_KEY: "dev-1234-5678"
+
 };
 
 const prodConfig = {
   SERVER_LINK: "http://production.server.com",
+  SERVER_LINK_LOCAL: "http://localhost/*",
   API_KEY: "prod-8765-4321"
 };
 

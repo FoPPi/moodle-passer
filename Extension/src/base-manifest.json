@@ -16,7 +16,7 @@
       {
         "css": ["./styles/content.css"],
         "js": ["./scripts/content.js"],
-        "matches": ["*://*.edu.ua/mod/quiz/*","*://*.edu.ua/moodle/mod/quiz/*"],
+        "matches": ["*://*.edu.ua/mod/quiz/*","*://*.edu.ua/moodle/mod/quiz/*","http://127.0.0.1:5500/*"],
         "run_at": "document_idle"
       }
     ]
