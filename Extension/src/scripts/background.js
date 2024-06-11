@@ -3,24 +3,39 @@ import browser from "webextension-polyfill";
 const serverLink = process.env.SERVER_LINK;
 const apiKey = process.env.API_KEY;
 
+function getNormalQuestions(data) {
+  const { test_type, question, prompt, answers } = data;
+  const dataText = `
+  Test Type: ${test_type}
+  Question: ${question}
+  Prompt: ${prompt === 1 ? 'Select only one answer' : prompt === 2 ? 'Select one or several answers' : 'Write what I need to enter in input'}
+  Answers: ${answers.join(', ')}
+  `;
+
+  return dataText;
+}
+
+
 async function fetchAPI(endpoint, method, userKey, data) {
   const settings = await browser.storage.sync.get(['provider', 'localModel', 'localPort']);
 
-  let url = `${serverLink}${endpoint}`;
+  if (settings.provider === 'localServer' && endpoint === "/") {
+    return fetchLocalAPI(endpoint, method, userKey, data, settings.localModel, settings.localPort);
+  } else {
+    return fetchRemoteAPI(endpoint, method, userKey, data);
+  }
+}
+
+
+async function fetchRemoteAPI(endpoint, method, userKey, data) {
+  const url = `${serverLink}${endpoint}`;
   const headers = new Headers({
     "Content-Type": "application/json",
+    "X-Api-Key": apiKey,
   });
 
-
-  if (settings.provider === 'localServer' && endpoint === "/") {
-    url = `http://localhost:${settings.localPort}/api/generate`;
-    data = { model: settings.localModel, prompt: {...data}, format: "json", stream: false};
-  } else {
-    url = `${serverLink}${endpoint}`;
-    headers.append("X-Api-Key", apiKey);
-    if (userKey) {
-      headers.append("X-User-Key", userKey);
-    }
+  if (userKey) {
+    headers.append("X-User-Key", userKey);
   }
 
   const fetchOptions = {
@@ -28,13 +43,9 @@ async function fetchAPI(endpoint, method, userKey, data) {
     headers: headers,
   };
 
-
-
   if (data) {
     fetchOptions.body = JSON.stringify(data);
   }
-
-  console.log(fetchOptions)
 
   try {
     const response = await fetch(url, fetchOptions);
@@ -59,6 +70,38 @@ async function fetchAPI(endpoint, method, userKey, data) {
     return response.json();
   } catch (error) {
     console.error("Error with fetch operation:", error);
+    return { error: true, message: error.message };
+  }
+}
+
+async function fetchLocalAPI(endpoint, method, userKey, data, localModel, localPort) {
+  const headers = new Headers({
+    "Content-Type": "application/json",
+  });
+
+  const url = `http://localhost:11434/api/generate`;
+
+ console.log(url);
+
+  const fetchOptions = {
+    method: method,
+    headers: headers,
+    body: JSON.stringify({ model: localModel, prompt: getNormalQuestions(data), stream: false }),
+  };
+
+
+
+  console.log(fetchOptions);
+
+  try {
+    const response = await fetch(url, fetchOptions);
+    console.log(response);
+    if (!response.ok) {
+      throw new Error("Local server error");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error with local fetch operation:", error);
     return { error: true, message: error.message };
   }
 }
@@ -142,6 +185,22 @@ async function getApiKeyHandler() {
   }
 }
 
+
+async function getModelsHandler() {
+  try {
+    const response = await fetch(`http://localhost:11434/api/tags`);
+    const data = await response.json();
+    return { status: "success", data: data };
+  } catch (error) {
+    console.error("Error retrieving the API key:", error);
+    return {
+      status: "error",
+      message: `Error retrieving the API key: ${error.message}`,
+    };
+  }
+}
+
+
 async function getAutoPassEnabled() {
   try {
     const result = await browser.storage.sync.get("autoPassObj");
@@ -218,6 +277,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse(response)
       );
       break;
+      case "getModels":
+        getModelsHandler().then((response) => sendResponse(response));
+        break;
     case "getAutoPassEnabled":
       getAutoPassEnabled().then((response) => sendResponse(response));
       break;

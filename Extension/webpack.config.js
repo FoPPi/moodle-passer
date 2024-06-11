@@ -58,12 +58,12 @@ function modifyManifest(browser) {
     };
     manifest['background'] = { "scripts": ["./scripts/background.js"] };
     manifest['browser_action'] = { "default_popup": "./pages/popup.html" };
-    manifest['permissions'] = [...manifest.permissions, `${SERVER_LINK}/*, ${SERVER_LINK_LOCAL}`];
+    manifest['permissions'] = [...manifest.permissions, `${SERVER_LINK}/*`, ...SERVER_LINK_LOCAL];
   } else {
     manifest['manifest_version'] = 3;
     manifest['action'] = { "default_popup": "./pages/popup.html" };
     manifest['background'] = { "service_worker": "./scripts/background.js" };
-    manifest['host_permissions'] = [`${SERVER_LINK}/*, ${SERVER_LINK_LOCAL}`];
+    manifest['host_permissions'] = [`${SERVER_LINK}/*`, ...SERVER_LINK_LOCAL];
   }
   return JSON.stringify(manifest, null, 2);
 }

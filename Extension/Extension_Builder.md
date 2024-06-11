@@ -29,16 +29,23 @@ npm ci
 To allow Webpack to select the appropriate host and links for production and development environments, create a `config.js` file in the root directory with the following content:
 
 ```javascript
+const LAMA_HOST = [
+  "http://*:11434/api/tags",
+  "http://*:11434/api/generate",
+  "https://*:11434/api/tags",
+  "https://*:11434/api/generate"
+]
+
 const devConfig = {
   SERVER_LINK: "http://localhost:8000",
-  SERVER_LINK_LOCAL: "http://localhost/*",
+  SERVER_LINK_LOCAL: LAMA_HOST,
   API_KEY: "dev-1234-5678"
 
 };
 
 const prodConfig = {
   SERVER_LINK: "http://production.server.com",
-  SERVER_LINK_LOCAL: "http://localhost/*",
+  SERVER_LINK_LOCAL: LAMA_HOST,
   API_KEY: "prod-8765-4321"
 };
 
